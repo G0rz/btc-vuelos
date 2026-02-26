@@ -1,4 +1,4 @@
-export interface Vuelo {
+export interface VueloInterface {
     GPID: number;
     NOMBRE: string;
     "REQUIERE VUELO": string;
@@ -37,4 +37,20 @@ export interface Vuelo {
     FECHA_5: string;
     ENCUENTRO: number;
     HORA: string;
+}
+
+export interface TicketInterface {
+    nombre: string,
+    airline: string,
+    fecha: Date,
+    origen: string,
+    destino: string,
+    clave: string,
+    hSalida: string
+    hLlegada: string
+    numero: string
+}
+
+export interface BusTicketInterface {
+    id: string;
 }
