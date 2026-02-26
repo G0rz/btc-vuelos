@@ -1,22 +1,43 @@
-import Navbar from "@/components/vuelos/Navbar";
 import {VueloInterface} from "@/interfaces";
 import Ticket from "@/components/vuelos/Ticket";
 import BusTicket from "@/components/vuelos/BusTicket";
+import {Metadata} from "next";
 
-const getVuelos = async (GPID: number): Promise<VueloInterface> => {
-    const data = await fetch(`https://script.google.com/macros/s/AKfycbzSSa07gGO7VV69I_q72u4Td_6oCSdTmnPrVe-wB0bJf5OMQPX8u2PgrPK3v07Y4A3izA/exec?GPID=${GPID}`)
-        .then(response => response.json());
-
-    return data[GPID][0]
+interface Props {
+    params: Promise<{ id: string }>;
 }
 
-export default async function VuelosPage() {
+export async function generateMetadata({params}: Props): Promise<Metadata> {
+   try {
+       const {id} = await params;
+       const vuelo = await getVuelos(id);
+       return {
+           title: `${id} | ${vuelo.NOMBRE}`
+       }
+   }catch (error){
+       return {
+           title: `PEPSICO | OOPS`,
+           description: 'El usuario que buscas no existe'
+       }
+   }
 
-    const vuelo = await getVuelos(80871264);
-    console.log(vuelo)
+}
+
+const getVuelos = async (GPID: string): Promise<VueloInterface> => {
+    const data = await fetch(`https://script.google.com/macros/s/AKfycbzSSa07gGO7VV69I_q72u4Td_6oCSdTmnPrVe-wB0bJf5OMQPX8u2PgrPK3v07Y4A3izA/exec?GPID=${GPID}`, {
+        cache: "force-cache"
+    }).then(response => response.json());
+
+    return data[GPID][0];
+}
+
+export default async function VuelosPage({params}: Props) {
+
+    const {id} = await params;
+    const vuelo = await getVuelos(id);
+
     return (
         <main>
-            <Navbar/>
             <div className="bg-white max-w-screen min-h-[90vh] p-12 font-stretch-expanded">
                 <h1 className="uppercase text-4xl font-black text-center text-[#02355A]">Vuelos</h1>
                 {vuelo.VUELO_1 && <Ticket nombre={vuelo.NOMBRE} airline={vuelo.AEROLINEA_1} numero={vuelo.VUELO_1}
